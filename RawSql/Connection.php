@@ -72,8 +72,8 @@ class Connection {
 
     if (isset($url['query']))
     {
-      foreach (explode('/&/', $url['query']) as $pair) {
-        list($name, $value) = explode('=', $pair);
+      foreach (preg_split('/&/', $url['query']) as $pair) {
+        list($name, $value) = preg_split('/=/', $pair);
 
         if ($name == 'charset')
           $info->charset = $value;
@@ -139,7 +139,8 @@ class Connection {
   public function set_encoding($charset)
   {
     $params = array($charset);
-    $this->prepare('SET NAMES ?', $params);
+    $stmt = $this->prepare('SET NAMES ?');
+    $stmt->execute($params);
   }
 
 
