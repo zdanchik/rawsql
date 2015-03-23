@@ -80,8 +80,8 @@ abstract class RawSql {
       } else {
         $keys[] = '/[?]/';
       }
-      if(is_numeric($value)) {
-        $values[] = intval($value);
+      if(is_int($value) || is_float($value)) {
+        $values[] = $value;
       } else {
         $values[] = $this->getConnection()->quote($value);
       }
