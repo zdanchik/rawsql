@@ -8,6 +8,7 @@
  */
 namespace RawSql\Action;
 
+use RawSql\Cache;
 use RawSql\RawArray;
 use RawSql\RawSql;
 
@@ -262,14 +263,14 @@ class RawSqlSelect extends RawSql {
     if ($this->_conn) {
       if ($this->_cached) {
         $key  = self::CACHE_PREFIX . md5($this . $one . implode(',', $this->getArgs()));
-        $data = $this->getCache()->get($key);
+        $data = $this->getCache()->get([$key])->getData();
         if (!$data) {
           //$a         = microtime(true);
           $statement = $this->getConnection()->prepare($this);
           $statement->execute($this->getArgs());
           if ($this->getConnection()->errorCode() == \PDO::ERR_NONE) {
             $data = $one ? $statement->fetch(\PDO::FETCH_ASSOC) : $statement->fetchAll(\PDO::FETCH_ASSOC);
-            $this->getCache()->set($key, serialize($data), $this->_cached_time);
+            $this->getCache()->set([$key], serialize($data), $this->_cached_time);
           }
           //$b = microtime(true);
           //if (sfConfig::get('sf_web_debug')) {
@@ -294,13 +295,10 @@ class RawSqlSelect extends RawSql {
     return new RawArray($data ? $data : array());
   }
 
-  protected $cache;
+  //protected $cache;
   public function getCache()
   {
-    if ($this->cache == null) {
-      $this->cache = new TeamoCache();
-    }
-    return $this->cache;
+    return Cache::getInstance('rawsql_select');
   }
 
   public function setSelectFields($fields)

@@ -13,7 +13,8 @@
         }
     ],
     "require": {
-        "php": ">=5.4.0"
+        "php": ">=5.4.0",
+        "sonata-project/cache": ">=1.0.4"
     },
     "suggest": {
         "ext-mcrypt": "Required for HTTP cookie encryption"
