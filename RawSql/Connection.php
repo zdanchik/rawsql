@@ -117,6 +117,7 @@ class Connection {
     self::$cfg = $connections;
   }
 
+  private $_conn_string = null;
   protected function __construct($info)
   {
     try {
@@ -130,7 +131,8 @@ class Connection {
       }
       else
         $host = "unix_socket=$info->host";
-      $this->connection = new PDO("$info->protocol:$host;dbname=$info->db;charset=$info->charset", $info->user, $info->pass, static::$PDO_OPTIONS);
+      $this->_conn_string = "$info->protocol:$host;dbname=$info->db;charset=$info->charset";
+      $this->connection = new PDO($this->_conn_string, $info->user, $info->pass, static::$PDO_OPTIONS);
     } catch (PDOException $e) {
       throw new \Exception($e);
     }
@@ -171,6 +173,10 @@ class Connection {
 
   public function quote($value) {
     return $this->connection->quote($value);
+  }
+
+  public function __toString() {
+    return $this->_conn_string;
   }
 
 

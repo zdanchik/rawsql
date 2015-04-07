@@ -262,38 +262,61 @@ class RawSqlSelect extends RawSql {
     $data = array();
     if ($this->_conn) {
       if ($this->_cached) {
-        $key  = self::CACHE_PREFIX . md5($this . $one . implode(',', $this->getArgs()));
+        $key  = self::CACHE_PREFIX . $this->_conn .  md5($this . $one . implode(',', $this->getArgs()));
         $data = $this->getCache()->get([$key])->getData();
         if (!$data) {
-          //$a         = microtime(true);
-          $statement = $this->getConnection()->prepare($this);
-          $statement->execute($this->getArgs());
-          if ($this->getConnection()->errorCode() == \PDO::ERR_NONE) {
-            $data = $one ? $statement->fetch(\PDO::FETCH_ASSOC) : $statement->fetchAll(\PDO::FETCH_ASSOC);
+          $data = $this->getData($one);
+          if ($data) {
             $this->getCache()->set([$key], serialize($data), $this->_cached_time);
           }
-          //$b = microtime(true);
-          //if (sfConfig::get('sf_web_debug')) {
-          //  sfContext::getInstance()->getLogger()->log('{RawSql}' . $this->showQuery() . ' time: ' . ($b - $a));
-          //}
         } else {
           $data = unserialize($data);
         }
       } else {
-        //$a         = microtime(true);
-        $statement = $this->getConnection()->prepare($this);
-        $statement->execute($this->getArgs());
-        if ($this->getConnection()->errorCode() == \PDO::ERR_NONE) {
-          $data = $one ? $statement->fetch(\PDO::FETCH_ASSOC) : $statement->fetchAll(\PDO::FETCH_ASSOC);
-        }
-        //$b = microtime(true);
-        //if (sfConfig::get('sf_web_debug')) {
-        //  sfContext::getInstance()->getLogger()->log('{RawSql}' . $this->showQuery() . ' time: ' . ($b - $a));
-        //}
+        $data  = $this->getData($one);
       }
     }
     return new RawArray($data ? $data : array());
   }
+
+  private function getData($one) {
+    return $one ? $this->fetchOne() : $this->fetchAll();
+  }
+
+  public function fetch($callback) {
+    $stmt = $this->getPreparedStmt();
+    while ($data = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+      $callback($data);
+    }
+  }
+
+  private function fetchAll() {
+    $stmt = $this->getPreparedStmt();
+    return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+  }
+
+  private function fetchOne() {
+    $stmt = $this->getPreparedStmt();
+    return $stmt->fetch(\PDO::FETCH_ASSOC);
+  }
+
+  /**
+   * @return null|\PDOStatement
+   */
+  public function getPreparedStmt() {
+    /**
+     * @var $statement \PDOStatement
+     */
+    $statement = $this->getConnection()->prepare($this);
+    $statement->execute($this->getArgs());
+    if ($this->getConnection()->errorCode() == \PDO::ERR_NONE) {
+      return $statement;
+    }
+    return null;
+  }
+
+
+
 
   //protected $cache;
   public function getCache()
