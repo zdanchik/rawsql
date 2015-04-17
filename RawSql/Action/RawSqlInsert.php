@@ -144,14 +144,11 @@ class RawSqlInsert extends RawSql
   public function execute()
   {
     if ($this->_conn) {
-      $a         = microtime(true);
       $statement = $this->getConnection()->prepare($this);
       $statement->execute($this->getArgs());
-      $b = microtime(true);
-      //if (sfConfig::get('sf_web_debug')) {
-      //  sfContext::getInstance()->getLogger()->log('{RawSql}' . $this->showQuery() . ' time: ' . ($b - $a));
-      //}
       $this->last_insert_id = $this->getConnection()->lastInsertId();
+      $this->insert = null;
+      $this->args   = null;
 
       return is_numeric($this->last_insert_id);
     }
