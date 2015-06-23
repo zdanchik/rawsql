@@ -96,7 +96,7 @@ class RawSqlSelect extends RawSql {
     if (count($values)) {
       $this->andWhere("{$field} IN (". implode(', ', array_fill(0, count($values), '?')).")", $values);
     } else {
-      throw new Exception('Invalid count of elements in query');
+      throw new \Exception('Invalid count of elements in query');
     }
     return $this;
   }

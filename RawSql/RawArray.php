@@ -54,6 +54,8 @@ class RawArray extends \ArrayObject {
         foreach ($field as $needField) {
           if (isset($row[$needField])) {
             $add[$needField] = $row[$needField];
+          } else {
+            $add[$needField] = null;
           }
         }
       } else {
