@@ -114,7 +114,7 @@ class RawSqlInsert extends RawSql
 
   protected function getColumnsSql()
   {
-    return '(' . join(', ', $this->columns) . ')';
+    return '(`' . join('`, `', $this->columns) . '`)';
   }
 
   /**
