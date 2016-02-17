@@ -179,5 +179,9 @@ class Connection {
     return $this->_conn_string;
   }
 
+  public function inTransaction()
+  {
+    return $this->connection->inTransaction();
+  }
 
 } 
