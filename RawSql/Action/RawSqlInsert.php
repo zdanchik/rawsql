@@ -25,14 +25,11 @@ class RawSqlInsert extends RawSql
    *
    * @return RawSqlInsert
    */
-  function __construct($connection, $table_name = null, $columns)
+  function __construct($connection, $table_name = null, $columns = null)
   {
     $this->_conn = $connection;
     if ($table_name) {
       $this->table_name = $table_name;
-    }
-    if (!is_array($columns) || empty($columns)) {
-      throw new \Exception("Columns parameter must be array with at least one argument");
     }
     $this->columns = $columns;
 
@@ -79,17 +76,8 @@ class RawSqlInsert extends RawSql
 
   public function setValuesFromArray($params)
   {
-    $result = array();
-    foreach ($this->columns as $column) {
-      if (!array_key_exists($column, $params)) {
-        throw new \Exception('Not set value for column ' . $column);
-      }
-
-      $result[] = $params[$column];
-    }
-
-    $this->processInsertArguments($result);
-
+    $this->columns = array_keys($params);
+    $this->processInsertArguments($params);
     return $this;
   }
 
@@ -114,6 +102,9 @@ class RawSqlInsert extends RawSql
 
   protected function getColumnsSql()
   {
+    if (!is_array($this->columns) || empty($this->columns)) {
+      throw new \Exception("Columns parameter must be array with at least one argument");
+    }
     return '(`' . join('`, `', $this->columns) . '`)';
   }
 
