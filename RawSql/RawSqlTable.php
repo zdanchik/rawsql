@@ -11,4 +11,12 @@ namespace RawSql;
 
 class RawSqlTable {
 
+  protected static function getAllowedFields($table) {
+    return RawSql::select(Connection::getInstance('loancrm'), 'COLUMN_NAME')
+      ->from('INFORMATION_SCHEMA.COLUMNS')
+      ->andWhere("table_name = ?", $table)
+      ->execute()
+      ->parse('column_name');
+  }
+
 } 
