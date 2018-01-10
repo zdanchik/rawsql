@@ -308,7 +308,16 @@ class RawSqlSelect extends RawSql {
      * @var $statement \PDOStatement
      */
     $statement = $this->getConnection()->prepare($this);
-    $statement->execute($this->getArgs());
+    try {
+      $statement->execute($this->getArgs());
+    } catch (\PDOException $e) {
+      /**
+       * Solve 2006 MySQL error
+       */
+      $this->getConnection()->reconnect();
+      $statement = $this->getConnection()->prepare($this);
+      $statement->execute($this->getArgs());
+    }
     if ($this->getConnection()->errorCode() == \PDO::ERR_NONE) {
       return $statement;
     }

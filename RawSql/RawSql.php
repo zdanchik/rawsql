@@ -106,7 +106,7 @@ abstract class RawSql {
   }
 
   /**
-   * @return \App\Lib\RawSql\Connection
+   * @return Connection
    */
   public function getConnection()
   {

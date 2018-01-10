@@ -13,11 +13,18 @@ use PDOException;
 
 class Connection {
 
-  static $PDO_OPTIONS = array(
-    PDO::ATTR_CASE => PDO::CASE_LOWER,
-    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-    PDO::ATTR_ORACLE_NULLS => PDO::NULL_NATURAL,
-    PDO::ATTR_STRINGIFY_FETCHES => false);
+  public static $PDO_OPTIONS = array(
+    PDO::ATTR_CASE              => PDO::CASE_LOWER,
+    PDO::ATTR_ERRMODE           => PDO::ERRMODE_EXCEPTION,
+    PDO::ATTR_ORACLE_NULLS      => PDO::NULL_NATURAL,
+    PDO::ATTR_STRINGIFY_FETCHES => false,
+    PDO::ATTR_PERSISTENT        => true,
+    PDO::ATTR_TIMEOUT           => 10,
+  );
+
+  private
+    $user = null,
+    $pass = null;
 
   public static function parse_connection_url($connection_url)
   {
@@ -131,11 +138,19 @@ class Connection {
       }
       else
         $host = "unix_socket=$info->host";
+
+      $this->user = $info->user;
+      $this->pass = $info->pass;
+
       $this->_conn_string = "$info->protocol:$host;dbname=$info->db;charset=$info->charset";
-      $this->connection = new PDO($this->_conn_string, $info->user, $info->pass, static::$PDO_OPTIONS);
+      $this->connection = new PDO($this->_conn_string, $this->user, $this->pass, static::$PDO_OPTIONS);
     } catch (PDOException $e) {
       throw new \Exception($e);
     }
+  }
+
+  public function reconnect() {
+    $this->connection = new PDO($this->_conn_string, $this->user, $this->pass, static::$PDO_OPTIONS);
   }
 
   public function set_encoding($charset)
