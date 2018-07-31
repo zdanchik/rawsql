@@ -26,7 +26,7 @@ class RawArray extends \ArrayObject {
   {
 
     $ret = array();
-    $group = is_string($group) ? array($group) : $group;
+    $group = is_string($group) ? array($group) : (is_array($group) ? $group : []);
     $containedGroup = ($group) ? $containedGroup : true;
     $groupCount = count($group);
 
