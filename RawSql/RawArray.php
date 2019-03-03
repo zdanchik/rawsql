@@ -26,9 +26,9 @@ class RawArray extends \ArrayObject {
   {
 
     $ret = array();
-    $group = is_string($group) ? array($group) : (is_array($group) ? $group : []);
+    $group = is_string($group) ? array($group) : $group;
     $containedGroup = ($group) ? $containedGroup : true;
-    $groupCount = count($group);
+    $groupCount = $group ? count($group) : 0;
 
     foreach ($this->getArrayCopy() AS $row) {
       /**

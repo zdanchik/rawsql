@@ -41,17 +41,21 @@ class RawSqlUpdate extends RawSql {
     return $this;
   }
 
-  public function setArray($params)
+  public function setArray($params, $quote = true)
   {
     $i = 0;
+    $q = null;
+    if ($quote) {
+      $q = "`";
+    }
     foreach($params as $key => $value) {
       $i++;
       $str = null;
       if (!is_null($value)) {
         $this->update_args[] = $value;
-        $str = "`$key` = ?";
+        $str = "{$q}{$key}{$q} = ?";
       } else {
-        $str = "`$key` = NULL";
+        $str = "{$q}{$key}{$q} = NULL";
       }
       if (count($params) == $i - 1) {
         $str .= ",";

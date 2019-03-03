@@ -41,9 +41,9 @@ abstract class RawSql {
    * @param array $columns
    * @return RawSqlInsert
    */
-  public static function insert($connection, $table, $columns = null)
+  public static function insert($connection, $table, $columns = null, $quoteColumns = true)
   {
-    return new RawSqlInsert($connection, $table, $columns);
+    return new RawSqlInsert($connection, $table, $columns, $quoteColumns);
   }
 
   /**

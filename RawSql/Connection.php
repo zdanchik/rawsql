@@ -18,7 +18,7 @@ class Connection {
     PDO::ATTR_ERRMODE           => PDO::ERRMODE_EXCEPTION,
     PDO::ATTR_ORACLE_NULLS      => PDO::NULL_NATURAL,
     PDO::ATTR_STRINGIFY_FETCHES => false,
-    PDO::ATTR_PERSISTENT        => true,
+    PDO::ATTR_PERSISTENT        => false,
     PDO::ATTR_TIMEOUT           => 10,
   );
 
@@ -142,7 +142,11 @@ class Connection {
       $this->user = $info->user;
       $this->pass = $info->pass;
 
-      $this->_conn_string = "$info->protocol:$host;dbname=$info->db;charset=$info->charset";
+      $str = "$info->protocol:$host;dbname=$info->db";
+      if (!empty($info->charset)) {
+        $str .= ";charset={$info->charset}";
+      }
+      $this->_conn_string = $str;
       $this->connection = new PDO($this->_conn_string, $this->user, $this->pass, static::$PDO_OPTIONS);
     } catch (PDOException $e) {
       throw new \Exception($e);

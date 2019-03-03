@@ -14,6 +14,7 @@ class RawSqlInsert extends RawSql
 {
   protected $insert = null;
   protected $columns = null;
+  protected $quoteColumns = true;
   protected $on_duplicate = null;
   protected $last_insert_id = null;
   protected $ignore = false;
@@ -25,14 +26,14 @@ class RawSqlInsert extends RawSql
    *
    * @return RawSqlInsert
    */
-  function __construct($connection, $table_name = null, $columns = null)
+  function __construct($connection, $table_name = null, $columns = null, $quoteColumns = true)
   {
     $this->_conn = $connection;
     if ($table_name) {
       $this->table_name = $table_name;
     }
     $this->columns = $columns;
-
+    $this->quoteColumns = $quoteColumns;
     return $this;
   }
 
@@ -105,7 +106,13 @@ class RawSqlInsert extends RawSql
     if (!is_array($this->columns) || empty($this->columns)) {
       throw new \Exception("Columns parameter must be array with at least one argument");
     }
-    return '(`' . join('`, `', $this->columns) . '`)';
+    $clmns = null;
+    if ($this->quoteColumns) {
+      $clmns = '(`' . join('`, `', $this->columns) . '`)';
+    } else {
+      $clmns = '(' . join(', ', $this->columns) . ')';
+    }
+    return $clmns;
   }
 
   /**
